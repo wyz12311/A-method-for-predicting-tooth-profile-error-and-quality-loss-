@@ -1,31 +1,31 @@
 clc
 clear all
 close all
-% ¿ªÊ¼¼ÆÊ±
+% å¼€å§‹è®¡æ—¶
 tic;
-% ¶ÁÈ¡Êı¾İ
-dataO1 = xlsread('C:\Users\Administrator.DESKTOP-JC66FHP\Desktop\ĞÂ½¨ÎÄ¼ş¼Ğ\¼Ó¹¤Îó²îÔ¤²âĞ¡ÂÛÎÄ\Ğ¡ÂÛÎÄ³ÌĞò\1019 - ¸±±¾-1\Êµ¼ÊÊı¾İ2.xlsx');
+% è¯»å–æ•°æ®
+dataO1 = xlsread('C:\Users\Administrator.DESKTOP-JC66FHP\Desktop\date.xlsx');
 
-% ¶¨ÒåÊäÈëÌØÕ÷ºÍÊä³öÌØÕ÷µÄÊıÁ¿
+% å®šä¹‰è¾“å…¥ç‰¹å¾å’Œè¾“å‡ºç‰¹å¾çš„æ•°é‡
 num_input_features = 18;
-num_output_features = 2;
+num_output_features = 6;
 
-% Ñ¡ÔñÇ°18ÁĞ×÷ÎªÊäÈëÌØÕ÷£¬ºóÁ½ÁĞ×÷ÎªÊä³öÌØÕ÷
+% é€‰æ‹©å‰18åˆ—ä½œä¸ºè¾“å…¥ç‰¹å¾ï¼Œåä¸¤åˆ—ä½œä¸ºè¾“å‡ºç‰¹å¾
 x_feature_label = dataO1(:, 1:num_input_features);
 y_feature_label = dataO1(:, num_input_features + 1:num_input_features + num_output_features);
 
-% »®·ÖÑµÁ·¼¯ºÍÔ¤²â¼¯
+% åˆ’åˆ†è®­ç»ƒé›†å’Œé¢„æµ‹é›†
 train_data = dataO1(1:480, :);
 test_data = dataO1(481:500, :);
 
-% ÌáÈ¡ÑµÁ·¼¯ºÍ²âÊÔ¼¯µÄÊäÈëºÍÊä³öÌØÕ÷
+% æå–è®­ç»ƒé›†å’Œæµ‹è¯•é›†çš„è¾“å…¥å’Œè¾“å‡ºç‰¹å¾
 train_x_feature_label = train_data(:, 1:num_input_features);
 train_y_feature_label = train_data(:, num_input_features + 1:num_input_features + num_output_features);
 
 test_x_feature_label = test_data(:, 1:num_input_features);
 test_y_feature_label = test_data(:, num_input_features + 1:num_input_features + num_output_features);
 
-% ±ê×¼»¯ÑµÁ·¼¯ºÍ²âÊÔ¼¯µÄÊäÈëºÍÊä³öÌØÕ÷
+% æ ‡å‡†åŒ–è®­ç»ƒé›†å’Œæµ‹è¯•é›†çš„è¾“å…¥å’Œè¾“å‡ºç‰¹å¾
 x_mu = mean(train_x_feature_label);
 x_sig = std(train_x_feature_label);
 train_x_feature_label_norm = (train_x_feature_label - x_mu) ./ x_sig;
@@ -35,23 +35,23 @@ y_mu = mean(train_y_feature_label);
 y_sig = std(train_y_feature_label);
 train_y_feature_label_norm = (train_y_feature_label - y_mu) ./ y_sig;
 
-% ¹¹½¨Éñ¾­ÍøÂçÄ£ĞÍ
-% Á½¸öÒş²Ø²ã£¬Ã¿²ã¸÷10¸öÉñ¾­Ôª
-hidden_layer_sizes = [10, 10];  % Òş²Ø²ã´óĞ¡µÄÊı×é
+% æ„å»ºç¥ç»ç½‘ç»œæ¨¡å‹
+% ä¸¤ä¸ªéšè—å±‚ï¼Œæ¯å±‚å„10ä¸ªç¥ç»å…ƒ
+hidden_layer_sizes = [10, 10];  % éšè—å±‚å¤§å°çš„æ•°ç»„
 Mdl = newff(train_x_feature_label_norm', train_y_feature_label_norm', hidden_layer_sizes, {'logsig', 'logsig', 'purelin'});
 
-% ÑµÁ·Éñ¾­ÍøÂçÄ£ĞÍ
+% è®­ç»ƒç¥ç»ç½‘ç»œæ¨¡å‹
 [Mdl, ~] = train(Mdl, train_x_feature_label_norm', train_y_feature_label_norm');
 
-% Ê¹ÓÃÑµÁ·ºÃµÄÄ£ĞÍ½øĞĞÔ¤²â
+% ä½¿ç”¨è®­ç»ƒå¥½çš„æ¨¡å‹è¿›è¡Œé¢„æµ‹
 y_test_predict_norm = sim(Mdl, test_x_feature_label_norm')';
 y_test_predict = y_test_predict_norm .* y_sig + y_mu;
 
-% % »æÖÆ y1 µÄÔ¤²âÖµºÍÊµ¼ÊÖµ±È½ÏÍ¼
-% subplot(2, 1, 1);  % ·ÖÎªÁ½ĞĞÒ»ÁĞµÄÍ¼ĞÎµÄµÚÒ»ĞĞ
-% plot(test_y_feature_label(:,1), 'o-', 'LineWidth', 2, 'MarkerSize', 6);  % Êµ¼ÊÖµ
+% % ç»˜åˆ¶ y1 çš„é¢„æµ‹å€¼å’Œå®é™…å€¼æ¯”è¾ƒå›¾
+% subplot(2, 1, 1);  % åˆ†ä¸ºä¸¤è¡Œä¸€åˆ—çš„å›¾å½¢çš„ç¬¬ä¸€è¡Œ
+% plot(test_y_feature_label(:,1), 'o-', 'LineWidth', 2, 'MarkerSize', 6);  % å®é™…å€¼
 % hold on;
-% plot(y_test_predict(:,1), 'x--', 'LineWidth', 2, 'MarkerSize', 6);  % Ô¤²âÖµ
+% plot(y_test_predict(:,1), 'x--', 'LineWidth', 2, 'MarkerSize', 6);  % é¢„æµ‹å€¼
 % title('Comparison of Actual and Predicted Y1');
 % xlabel('Sample Index');
 % ylabel('Y1 Value');
@@ -59,11 +59,11 @@ y_test_predict = y_test_predict_norm .* y_sig + y_mu;
 % grid on;
 % hold off;
 % 
-% % »æÖÆ y2 µÄÔ¤²âÖµºÍÊµ¼ÊÖµ±È½ÏÍ¼
-% subplot(2, 1, 2);  % ·ÖÎªÁ½ĞĞÒ»ÁĞµÄÍ¼ĞÎµÄµÚ¶şĞĞ
-% plot(test_y_feature_label(:,2), 'o-', 'LineWidth', 2, 'MarkerSize', 6);  % Êµ¼ÊÖµ
+% % ç»˜åˆ¶ y2 çš„é¢„æµ‹å€¼å’Œå®é™…å€¼æ¯”è¾ƒå›¾
+% subplot(2, 1, 2);  % åˆ†ä¸ºä¸¤è¡Œä¸€åˆ—çš„å›¾å½¢çš„ç¬¬äºŒè¡Œ
+% plot(test_y_feature_label(:,2), 'o-', 'LineWidth', 2, 'MarkerSize', 6);  % å®é™…å€¼
 % hold on;
-% plot(y_test_predict(:,2), 'x--', 'LineWidth', 2, 'MarkerSize', 6);  % Ô¤²âÖµ
+% plot(y_test_predict(:,2), 'x--', 'LineWidth', 2, 'MarkerSize', 6);  % é¢„æµ‹å€¼
 % title('Comparison of Actual and Predicted Y2');
 % xlabel('Sample Index');
 % ylabel('Y2 Value');
@@ -71,83 +71,83 @@ y_test_predict = y_test_predict_norm .* y_sig + y_mu;
 % grid on;
 % hold off;
 
-% % ÏÔÊ¾Í¼ĞÎ
+% % æ˜¾ç¤ºå›¾å½¢
 % figure(gcf);
 
 %%
-rng(123);  % Éè¶¨Ëæ»úÖÖ×ÓÒÔ»ñµÃ¿ÉÖØ¸´µÄ½á¹û
+rng(123);  % è®¾å®šéšæœºç§å­ä»¥è·å¾—å¯é‡å¤çš„ç»“æœ
 
-% ²ÎÊı¸öÊı(Ç°18¸öÎª±äÁ¿)
+% å‚æ•°ä¸ªæ•°(å‰18ä¸ªä¸ºå˜é‡)
 nParameters = 18;
 
-% % ²ÎÊıÉÏÏÂ½ç
-% param_lb =[-0.001, -0.001, -0.001, -0.001, -0.001,  -0.001, -0.002,-0.010, -0.005, 0, 0, 0, 0, 0, 0, 0, 0, 0]; % ²ÎÊıÏÂ½ç
-% param_ub =[0.001, 0.001, 0.001, 0.001,0.001,0.001, 0.002, 0.010, 0.006, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1, 1, 1]; % ²ÎÊıÉÏ½ç
-% ²ÎÊıÉÏÏÂ½ç
-param_lb =[-0.001, -0.001, -0.001, -0.001, -0.001,  -0.001, 0,-0.0011, -0.0044,0, 0, 0, 0, 0, 0, 0, 0, 0]; % ²ÎÊıÏÂ½ç
-param_ub =[0.001, 0.001, 0.001, 0.001,0.001,0.001, 0.0012, 0.0026, -0.002, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1, 1, 1]; % ²ÎÊıÉÏ½ç
+% % å‚æ•°ä¸Šä¸‹ç•Œ
+% param_lb =[-0.001, -0.001, -0.001, -0.001, -0.001,  -0.001, -0.002,-0.010, -0.005, 0, 0, 0, 0, 0, 0, 0, 0, 0]; % å‚æ•°ä¸‹ç•Œ
+% param_ub =[0.001, 0.001, 0.001, 0.001,0.001,0.001, 0.002, 0.010, 0.006, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1, 1, 1]; % å‚æ•°ä¸Šç•Œ
+% å‚æ•°ä¸Šä¸‹ç•Œ
+param_lb =[-0.001, -0.001, -0.001, -0.001, -0.001,  -0.001, 0,-0.0011, -0.0044,0, 0, 0, 0, 0, 0, 0, 0, 0]; % å‚æ•°ä¸‹ç•Œ
+param_ub =[0.001, 0.001, 0.001, 0.001,0.001,0.001, 0.0012, 0.0026, -0.002, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1, 1, 1]; % å‚æ•°ä¸Šç•Œ
 
-% Éè¶¨MCMC²ÎÊı
-nIterations1 = 500; % ÏÈÑéÑù±¾µÄµü´ú´ÎÊı
-nBurnIn1 = 100; % ÏÈÑéÑù±¾µÄÈ¼ÉÕÆÚ
-nChains1 = 500; % ÏÈÑéÑù±¾µÄÁ´Êı
+% è®¾å®šMCMCå‚æ•°
+nIterations1 = 500; % å…ˆéªŒæ ·æœ¬çš„è¿­ä»£æ¬¡æ•°
+nBurnIn1 = 100; % å…ˆéªŒæ ·æœ¬çš„ç‡ƒçƒ§æœŸ
+nChains1 = 500; % å…ˆéªŒæ ·æœ¬çš„é“¾æ•°
 
-nIterations2 =500; % ºóÑéÑù±¾µÄµü´ú´ÎÊı
-nBurnIn2 = 100; % ºóÑéÑù±¾µÄÈ¼ÉÕÆÚ
-nChains2 = 500; % ºóÑéÑù±¾µÄÁ´Êı
+nIterations2 =500; % åéªŒæ ·æœ¬çš„è¿­ä»£æ¬¡æ•°
+nBurnIn2 = 100; % åéªŒæ ·æœ¬çš„ç‡ƒçƒ§æœŸ
+nChains2 = 500; % åéªŒæ ·æœ¬çš„é“¾æ•°
 
-% ³õÊ¼»¯MCMCÁ´µÄÆğÊ¼Öµ£¨ÔÚÉÏÏÂ½ç·¶Î§ÄÚËæ»ú³õÊ¼»¯£©
+% åˆå§‹åŒ–MCMCé“¾çš„èµ·å§‹å€¼ï¼ˆåœ¨ä¸Šä¸‹ç•ŒèŒƒå›´å†…éšæœºåˆå§‹åŒ–ï¼‰
 initial_values = bsxfun(@plus, param_lb, bsxfun(@times, param_ub - param_lb, rand(nChains1 + nChains2, nParameters)));
-% ´æ´¢MCMCÁ´µÄÑù±¾
+% å­˜å‚¨MCMCé“¾çš„æ ·æœ¬
 chain_samples1 = NaN(nIterations1, nChains1, nParameters);
 chain_samples2 = NaN(nIterations2, nChains2, nParameters);
-% ´æ´¢ºóÑé·Ö²¼Ñù±¾
+% å­˜å‚¨åéªŒåˆ†å¸ƒæ ·æœ¬
 posterior_samples = NaN(nChains2, nParameters);
 
-% ´æ´¢ÏÈÑéÑù±¾µÄÄ¿±êº¯ÊıÖµ
-model_outputs_prior = NaN(nChains1, 2, nIterations1);  % 2 ±íÊ¾Ä¿±êº¯ÊıÓĞÁ½¸öÊä³ö
+% å­˜å‚¨å…ˆéªŒæ ·æœ¬çš„ç›®æ ‡å‡½æ•°å€¼
+model_outputs_prior = NaN(nChains1, 2, nIterations1);  % 2 è¡¨ç¤ºç›®æ ‡å‡½æ•°æœ‰ä¸¤ä¸ªè¾“å‡º
 
-% ¹ÀËã¾ùÖµºÍ±ê×¼²î
+% ä¼°ç®—å‡å€¼å’Œæ ‡å‡†å·®
 param_mean = (param_lb + param_ub) / 2; 
 param_std = (param_ub - param_lb) / (2 * sqrt(3)); 
 
-% ´æ´¢¾ùÖµºÍ±ê×¼²î
+% å­˜å‚¨å‡å€¼å’Œæ ‡å‡†å·®
 for i = 1:length(param_mean)
     eval(['mu_param', num2str(i), ' = param_mean(i);']);
     eval(['sigma_param', num2str(i), ' = param_std(i);']);
 end
 
-% ´æ´¢¾ùÖµºÍ±ê×¼²î
+% å­˜å‚¨å‡å€¼å’Œæ ‡å‡†å·®
 mu_prior = [mu_param1, mu_param2, mu_param3, mu_param4, mu_param5, mu_param6, mu_param7, mu_param8, mu_param9, mu_param10, mu_param11, mu_param12, mu_param13, mu_param14, mu_param15, mu_param16, mu_param17, mu_param18];
 sigma_prior = [sigma_param1, sigma_param2, sigma_param3, sigma_param4, sigma_param5, sigma_param6, sigma_param7, sigma_param8, sigma_param9, sigma_param10, sigma_param11, sigma_param12, sigma_param13, sigma_param14, sigma_param15, sigma_param16, sigma_param17, sigma_param18];
 
-% ÏÈÑéÑù±¾Éú³É
+% å…ˆéªŒæ ·æœ¬ç”Ÿæˆ
 for chain1 = 1:nChains1
     current_params1 = initial_values(chain1, :);
     accepted_samples1 = zeros(nIterations1- nBurnIn1, nParameters);
     count1 = 1;
     for iteration1 = 1:nIterations1
         proposed_params1 = current_params1;
-        % ÕıÌ¬·Ö²¼²ÉÑù¸üĞÂ²ÎÊı
+        % æ­£æ€åˆ†å¸ƒé‡‡æ ·æ›´æ–°å‚æ•°
         proposed_params1(1:9) = normrnd(mu_prior(1:9), sigma_prior(1:9)); 
         proposed_params1(10:18) = normrnd(mu_prior(10:18), sigma_prior(10:18)); 
         
-        % Ä£ĞÍÔ¤²â
+        % æ¨¡å‹é¢„æµ‹
         y_current_norm1 = sim(Mdl, proposed_params1')';
-        Y_current1 = y_current_norm1 .* y_sig + y_mu; % ·´¹éÒ»»¯
+        Y_current1 = y_current_norm1 .* y_sig + y_mu; % åå½’ä¸€åŒ–
 
-        % Ó¦ÓÃÔ¼ÊøÌõ¼ş
+        % åº”ç”¨çº¦æŸæ¡ä»¶
         if Y_current1(1) == 0
             Y_current1(2) = 0;
         else
             Y_current1(2) = max(0, Y_current1(2));
         end
 
-        % ´æ´¢Ä£ĞÍÊä³ö
+        % å­˜å‚¨æ¨¡å‹è¾“å‡º
         model_outputs_prior(iteration1, 1, chain1) = Y_current1(:, 1);
         model_outputs_prior(iteration1, 2, chain1) = Y_current1(:, 2);
 
-        % ¸üĞÂ²ÎÊı
+        % æ›´æ–°å‚æ•°
         current_params1 = proposed_params1;
         if iteration1 > nBurnIn1
             accepted_samples1(count1, :) = proposed_params1;
@@ -157,34 +157,34 @@ for chain1 = 1:nChains1
     chain_samples1(1:nIterations1 - nBurnIn1, chain1, :) = accepted_samples1;
 end
 
-% % ÏÈÑéÑù±¾Éú³É
+% % å…ˆéªŒæ ·æœ¬ç”Ÿæˆ
 % for chain1 = 1:nChains1
 %     current_params1 = initial_values(chain1, :);
 %     accepted_samples1 = zeros(nIterations1 - nBurnIn1, nParameters);
 %     count1 = 1;
 %     for iteration1 = 1:nIterations1
 %         proposed_params1 = current_params1;
-%         % ÕıÌ¬·Ö²¼²ÉÑù¸üĞÂ²ÎÊı
+%         % æ­£æ€åˆ†å¸ƒé‡‡æ ·æ›´æ–°å‚æ•°
 %         proposed_params1(1:9) = normrnd(mu_prior(1:9), sigma_prior(1:9)); 
 %         proposed_params1(10:18) = normrnd(mu_prior(10:18), sigma_prior(10:18)); 
 %         
-%         % Ä£ĞÍÔ¤²â
+%         % æ¨¡å‹é¢„æµ‹
 %         y_current_norm1 = sim(Mdl, proposed_params1')';
-%         Y_current1 = y_current_norm1 .* y_sig + y_mu; % ·´¹éÒ»»¯
+%         Y_current1 = y_current_norm1 .* y_sig + y_mu; % åå½’ä¸€åŒ–
 % 
-%         % Ó¦ÓÃÔ¼ÊøÌõ¼ş
+%         % åº”ç”¨çº¦æŸæ¡ä»¶
 %         if Y_current1(1) == 0
 %             Y_current1(2) = 0;
 %         else
 %             Y_current1(2) = max(0, Y_current1(2));
 %         end
 % 
-%         % ´æ´¢Ä£ĞÍÊä³ö
+%         % å­˜å‚¨æ¨¡å‹è¾“å‡º
 %         model_outputs_prior(iteration1, 1, chain1) = Y_current1(:, 1);
 %         model_outputs_prior(iteration1, 2, chain1) = Y_current1(:, 2);
 % 
-%         % ¸üĞÂ²ÎÊı
-%         % Ö»ÔÚy2´óÓÚ0Ê±²Å¸üĞÂºÍ´æ´¢Ñù±¾
+%         % æ›´æ–°å‚æ•°
+%         % åªåœ¨y2å¤§äº0æ—¶æ‰æ›´æ–°å’Œå­˜å‚¨æ ·æœ¬
 %         if Y_current1(2) > 0
 %             current_params1 = proposed_params1;
 %             if iteration1 > nBurnIn1
@@ -193,31 +193,31 @@ end
 %             end
 %         end
 %     end
-%     % ´æ´¢Ã¿¸öÁ´µÄ²ÉÑù½á¹û£¬½öÕë¶Ô·ÇÈ¼ÉÕÆÚµÄµü´ú
+%     % å­˜å‚¨æ¯ä¸ªé“¾çš„é‡‡æ ·ç»“æœï¼Œä»…é’ˆå¯¹éç‡ƒçƒ§æœŸçš„è¿­ä»£
 %     chain_samples1(1:count1-1, chain1, :) = accepted_samples1(1:count1-1, :);
 % end
 
 % 
-% µ¼Èë¹Û²âÊı¾İ
+% å¯¼å…¥è§‚æµ‹æ•°æ®
 % actual_data = xlsread('14.xls');
 actual_data = xlsread('13.xls');
 actual_Y1 = actual_data(1:148, 1);
 actual_Y2 = actual_data(1:148, 2);
 
-% ¼ÆËãactual_dataÖĞy1ºÍy2µÄ¾ùÖµ
+% è®¡ç®—actual_dataä¸­y1å’Œy2çš„å‡å€¼
 mean_actual_Y1 = mean(actual_data(1:148, 1));
 mean_actual_Y2 = mean(actual_data(1:148, 2));
 
-% ºóÑéÑù±¾Éú³É
-model_outputs_posterior = NaN(nIterations2, 2, nChains2); % ´æ´¢ºóÑéÑù±¾µÄÄ¿±êº¯
+% åéªŒæ ·æœ¬ç”Ÿæˆ
+model_outputs_posterior = NaN(nIterations2, 2, nChains2); % å­˜å‚¨åéªŒæ ·æœ¬çš„ç›®æ ‡å‡½
 
-% ¼ÙÉèÒÑ¾­¶Ô actual_Y1 ½øĞĞÁËKDE£¬²¢»ñÈ¡ÁËÆÀ¹ÀµãºÍÃÜ¶ÈÖµ
+% å‡è®¾å·²ç»å¯¹ actual_Y1 è¿›è¡Œäº†KDEï¼Œå¹¶è·å–äº†è¯„ä¼°ç‚¹å’Œå¯†åº¦å€¼
 [f_Y1, xi_Y1] = ksdensity(actual_Y1);
 
-% ¼ÙÉè param_lb ºÍ param_ub ·Ö±ğÊÇ²ÎÊıµÄÏÂ½çºÍÉÏ½ç
+% å‡è®¾ param_lb å’Œ param_ub åˆ†åˆ«æ˜¯å‚æ•°çš„ä¸‹ç•Œå’Œä¸Šç•Œ
 param_range = param_ub - param_lb;
 
-% ³õÊ¼³¢ÊÔÊ¹ÓÃ²ÎÊı·¶Î§µÄÒ»¸öĞ¡±ÈÀı×÷Îª²½³¤
+% åˆå§‹å°è¯•ä½¿ç”¨å‚æ•°èŒƒå›´çš„ä¸€ä¸ªå°æ¯”ä¾‹ä½œä¸ºæ­¥é•¿
 step_size = 0.1 * param_range;
 
 for chain2 = 1:nChains2
@@ -225,45 +225,45 @@ for chain2 = 1:nChains2
     accepted_samples2 = zeros(nIterations2 - nBurnIn2, nParameters);
      count2 = 1;
     for iteration = 1:nIterations2
-        % Ê¹ÓÃÉñ¾­ÍøÂçÄ£ĞÍ½øĞĞµ±Ç°²ÎÊıµÄÔ¤²â
+        % ä½¿ç”¨ç¥ç»ç½‘ç»œæ¨¡å‹è¿›è¡Œå½“å‰å‚æ•°çš„é¢„æµ‹
         y_current_norm = sim(Mdl, current_params2')';
-        Y_current = y_current_norm .* y_sig + y_mu; % ·´¹éÒ»»¯
-        % Ó¦ÓÃÔ¼ÊøÌõ¼ş
+        Y_current = y_current_norm .* y_sig + y_mu; % åå½’ä¸€åŒ–
+        % åº”ç”¨çº¦æŸæ¡ä»¶
         if Y_current(1) == 0
             Y_current(2) = 0;
         else
             Y_current(2) = max(0, Y_current(2));
         end
-        % ¼ÆËãµ±Ç°×´Ì¬»ùÓÚy1µÄËÆÈ»Öµ
+        % è®¡ç®—å½“å‰çŠ¶æ€åŸºäºy1çš„ä¼¼ç„¶å€¼
         likelihood_current_Y1 = interp1(xi_Y1, f_Y1, Y_current(:, 1), 'linear', 0);
         likelihood_current = likelihood_current_Y1;
              
-        % Éú³ÉĞÂµÄÌáÒé²ÎÊı£¬Í¨¹ıÔÚµ±Ç°²ÎÊıµÄ»ù´¡ÉÏ¼ÓÈëËæ»úÈÅ¶¯
+        % ç”Ÿæˆæ–°çš„æè®®å‚æ•°ï¼Œé€šè¿‡åœ¨å½“å‰å‚æ•°çš„åŸºç¡€ä¸ŠåŠ å…¥éšæœºæ‰°åŠ¨
         proposed_params2 = current_params2 + normrnd(0, step_size, [1, nParameters]);
            
-        % ¶ÔÌáÒéµÄ²ÎÊıÉú³ÉÄ£ĞÍÔ¤²â
+        % å¯¹æè®®çš„å‚æ•°ç”Ÿæˆæ¨¡å‹é¢„æµ‹
         y_proposed_norm = sim(Mdl, proposed_params2')';
-        Y_proposed = y_proposed_norm .* y_sig + y_mu; % ·´¹éÒ»»¯
-        % Ó¦ÓÃÔ¼ÊøÌõ¼ş
+        Y_proposed = y_proposed_norm .* y_sig + y_mu; % åå½’ä¸€åŒ–
+        % åº”ç”¨çº¦æŸæ¡ä»¶
         if Y_proposed(1) == 0
             Y_proposed(2) = 0;
         else
             Y_proposed(2) = max(0, Y_proposed(2));
         end
         
-        % ¼ÆËãÌáÒé×´Ì¬»ùÓÚy1µÄËÆÈ»Öµ
+        % è®¡ç®—æè®®çŠ¶æ€åŸºäºy1çš„ä¼¼ç„¶å€¼
         likelihood_proposed_Y1 = interp1(xi_Y1, f_Y1, Y_proposed(:, 1), 'linear', 0);
         likelihood_proposed = likelihood_proposed_Y1;
        
-        % ½«y1ºÍy2µÄÄ£ĞÍÊä³ö´æ´¢µ½model_outputs_posteriorÖĞ
+        % å°†y1å’Œy2çš„æ¨¡å‹è¾“å‡ºå­˜å‚¨åˆ°model_outputs_posteriorä¸­
         model_outputs_posterior(iteration, 1, chain2) = Y_proposed(:, 1);
         model_outputs_posterior(iteration, 2, chain2) = Y_proposed(:, 2);
         
-        % ¼ÆËãÏÈÑé¸ÅÂÊ£¬×¢ÒâÕâÀïÊ¹ÓÃproposed_params2
+        % è®¡ç®—å…ˆéªŒæ¦‚ç‡ï¼Œæ³¨æ„è¿™é‡Œä½¿ç”¨proposed_params2
         prior_current = prod(normpdf(current_params1, mu_prior, sigma_prior));
         prior_proposed = prod(normpdf(proposed_params1, mu_prior, sigma_prior));
         
-        % ¼ÆËã½ÓÊÜÂÊ
+        % è®¡ç®—æ¥å—ç‡
         acceptance_ratio = (likelihood_proposed * prior_proposed) / (likelihood_current * prior_current);
 
         if rand() < acceptance_ratio
@@ -276,7 +276,7 @@ for chain2 = 1:nChains2
         end
     end
 
-% ´æ´¢Ã¿¸öÁ´µÄ²ÉÑù½á¹û£¬½öÕë¶Ô·ÇÈ¼ÉÕÆÚµÄµü´ú
+% å­˜å‚¨æ¯ä¸ªé“¾çš„é‡‡æ ·ç»“æœï¼Œä»…é’ˆå¯¹éç‡ƒçƒ§æœŸçš„è¿­ä»£
 chain_samples2(1:nIterations2 - nBurnIn2, chain2, :) = accepted_samples2;
 
 end
@@ -286,47 +286,47 @@ end
 %     accepted_samples2 = zeros(nIterations2 - nBurnIn2, nParameters);
 %     count2 = 1;
 %     for iteration2 = 1:nIterations2
-%         % Ê¹ÓÃÉñ¾­ÍøÂçÄ£ĞÍ½øĞĞµ±Ç°²ÎÊıµÄÔ¤²â
+%         % ä½¿ç”¨ç¥ç»ç½‘ç»œæ¨¡å‹è¿›è¡Œå½“å‰å‚æ•°çš„é¢„æµ‹
 %         y_current_norm = sim(Mdl, current_params2')';
-%         Y_current = y_current_norm .* y_sig + y_mu; % ·´¹éÒ»»¯
-%         % Ó¦ÓÃÔ¼ÊøÌõ¼ş
+%         Y_current = y_current_norm .* y_sig + y_mu; % åå½’ä¸€åŒ–
+%         % åº”ç”¨çº¦æŸæ¡ä»¶
 %         if Y_current(1) == 0
 %             Y_current(2) = 0;
 %         else
 %             Y_current(2) = max(0, Y_current(2));
 %         end
-%         % ¼ÆËãµ±Ç°×´Ì¬»ùÓÚy1µÄËÆÈ»Öµ
+%         % è®¡ç®—å½“å‰çŠ¶æ€åŸºäºy1çš„ä¼¼ç„¶å€¼
 %         likelihood_current_Y1 = interp1(xi_Y1, f_Y1, Y_current(:, 1), 'linear', 0);
 %         likelihood_current = likelihood_current_Y1;
 %              
-%         % Éú³ÉĞÂµÄÌáÒé²ÎÊı£¬Í¨¹ıÔÚµ±Ç°²ÎÊıµÄ»ù´¡ÉÏ¼ÓÈëËæ»úÈÅ¶¯
+%         % ç”Ÿæˆæ–°çš„æè®®å‚æ•°ï¼Œé€šè¿‡åœ¨å½“å‰å‚æ•°çš„åŸºç¡€ä¸ŠåŠ å…¥éšæœºæ‰°åŠ¨
 %         proposed_params2 = current_params2 + normrnd(0, step_size, [1, nParameters]);
 %            
-%         % ¶ÔÌáÒéµÄ²ÎÊıÉú³ÉÄ£ĞÍÔ¤²â
+%         % å¯¹æè®®çš„å‚æ•°ç”Ÿæˆæ¨¡å‹é¢„æµ‹
 %         y_proposed_norm = sim(Mdl, proposed_params2')';
-%         Y_proposed = y_proposed_norm .* y_sig + y_mu; % ·´¹éÒ»»¯
-%         % Ó¦ÓÃÔ¼ÊøÌõ¼ş
+%         Y_proposed = y_proposed_norm .* y_sig + y_mu; % åå½’ä¸€åŒ–
+%         % åº”ç”¨çº¦æŸæ¡ä»¶
 %         if Y_proposed(1) == 0
 %             Y_proposed(2) = 0;
 %         else
 %             Y_proposed(2) = max(0, Y_proposed(2));
 %         end
 %         
-%         % ¼ÆËãÌáÒé×´Ì¬»ùÓÚy1µÄËÆÈ»Öµ
+%         % è®¡ç®—æè®®çŠ¶æ€åŸºäºy1çš„ä¼¼ç„¶å€¼
 %         likelihood_proposed_Y1 = interp1(xi_Y1, f_Y1, Y_proposed(:, 1), 'linear', 0);
 %         likelihood_proposed = likelihood_proposed_Y1;
 %        
-%         % ½«y1ºÍy2µÄÄ£ĞÍÊä³ö´æ´¢µ½model_outputs_posteriorÖĞ
+%         % å°†y1å’Œy2çš„æ¨¡å‹è¾“å‡ºå­˜å‚¨åˆ°model_outputs_posteriorä¸­
 %         if Y_proposed(2) > 0
 %             model_outputs_posterior(iteration2, 1, chain2) = Y_proposed(:, 1);
 %             model_outputs_posterior(iteration2, 2, chain2) = Y_proposed(:, 2);
 %         end
 %         
-%         % ¼ÆËãÏÈÑé¸ÅÂÊ£¬×¢ÒâÕâÀïÊ¹ÓÃproposed_params2
+%         % è®¡ç®—å…ˆéªŒæ¦‚ç‡ï¼Œæ³¨æ„è¿™é‡Œä½¿ç”¨proposed_params2
 %         prior_current = prod(normpdf(current_params1, mu_prior, sigma_prior));
 %         prior_proposed = prod(normpdf(proposed_params1, mu_prior, sigma_prior));
 %         
-%         % ¼ÆËã½ÓÊÜÂÊ
+%         % è®¡ç®—æ¥å—ç‡
 %         acceptance_ratio = (likelihood_proposed * prior_proposed) / (likelihood_current * prior_current);
 % 
 %         if rand() < acceptance_ratio
@@ -334,7 +334,7 @@ end
 %         end
 %         
 %         if iteration2 > nBurnIn2
-%             % Ö»ÔÚy2´óÓÚ0Ê±²Å±£´æÑù±¾
+%             % åªåœ¨y2å¤§äº0æ—¶æ‰ä¿å­˜æ ·æœ¬
 %             if Y_proposed(2) > 0
 %                 accepted_samples2(count2, :) = current_params2;
 %                 count2 = count2 + 1;
@@ -342,288 +342,288 @@ end
 %         end
 %     end
 % 
-%     % ´æ´¢Ã¿¸öÁ´µÄ²ÉÑù½á¹û£¬½öÕë¶Ô·ÇÈ¼ÉÕÆÚµÄµü´ú
+%     % å­˜å‚¨æ¯ä¸ªé“¾çš„é‡‡æ ·ç»“æœï¼Œä»…é’ˆå¯¹éç‡ƒçƒ§æœŸçš„è¿­ä»£
 %     chain_samples2(1:nIterations2 - nBurnIn2, chain2, :) = accepted_samples2;
 % 
 % end
 
-% ·ÖÎöMCMC½á¹û
+% åˆ†æMCMCç»“æœ
 mean_params_prior = squeeze(mean(chain_samples1, 1));
 std_params_prior = squeeze(std(chain_samples1, 1));
 
 mean_params_posterior = squeeze(mean(chain_samples2, 1));
 std_params_posterior = squeeze(std(chain_samples2, 1));
 
-% ÌáÈ¡y1ºÍy2µÄºóÑéÑù±¾Öµ
-Y1_values = reshape(model_outputs_posterior(:, 1, :), [], 1); % ½«ËùÓĞÁ´µÄy1ÖµÌáÈ¡µ½Ò»¸öÏòÁ¿ÖĞ
-Y2_values = reshape(model_outputs_posterior(:, 2, :), [], 1); % ½«ËùÓĞÁ´µÄy2ÖµÌáÈ¡µ½Ò»¸öÏòÁ¿ÖĞ
+% æå–y1å’Œy2çš„åéªŒæ ·æœ¬å€¼
+Y1_values = reshape(model_outputs_posterior(:, 1, :), [], 1); % å°†æ‰€æœ‰é“¾çš„y1å€¼æå–åˆ°ä¸€ä¸ªå‘é‡ä¸­
+Y2_values = reshape(model_outputs_posterior(:, 2, :), [], 1); % å°†æ‰€æœ‰é“¾çš„y2å€¼æå–åˆ°ä¸€ä¸ªå‘é‡ä¸­
 
-% É¸Ñ¡³öy2 > 0µÄÑù±¾
+% ç­›é€‰å‡ºy2 > 0çš„æ ·æœ¬
 valid_indices = Y2_values > 0;
 Y1_values_filtered = Y1_values(valid_indices);
 Y2_values_filtered = Y2_values(valid_indices);
 
 %%
-%y1ÈÈÍ¼
-% ´´½¨Ë÷Òı
+%y1çƒ­å›¾
+% åˆ›å»ºç´¢å¼•
 x_values = (1:length(Y1_values_filtered))';
-% ¶¨Òå·ÖÏäÊı
-num_bins_x = 20; % Ñù±¾Ë÷ÒıµÄ·ÖÏäÊı
-num_bins_y = 20; % Êı¾İÖµµÄ·ÖÏäÊı
-% ´´½¨·ÖÏä±ß½ç
+% å®šä¹‰åˆ†ç®±æ•°
+num_bins_x = 20; % æ ·æœ¬ç´¢å¼•çš„åˆ†ç®±æ•°
+num_bins_y = 20; % æ•°æ®å€¼çš„åˆ†ç®±æ•°
+% åˆ›å»ºåˆ†ç®±è¾¹ç•Œ
 x_edges = linspace(min(x_values), max(x_values), num_bins_x + 1);
 y_edges = linspace(min(Y1_values_filtered), max(Y1_values_filtered), num_bins_y + 1);
-% ¼ÆËã¶şÎ¬Ö±·½Í¼
+% è®¡ç®—äºŒç»´ç›´æ–¹å›¾
 [counts_2d, ~, ~] = histcounts2(x_values, Y1_values_filtered, x_edges, y_edges);
-% ´´½¨ÈÈÍ¼
+% åˆ›å»ºçƒ­å›¾
 figure('Color', 'w');
 imagesc(x_edges(1:end-1), y_edges(1:end-1), counts_2d');
-set(gca, 'YDir', 'normal'); % È·±£ y Öá·½ÏòÕıÈ·
+set(gca, 'YDir', 'normal'); % ç¡®ä¿ y è½´æ–¹å‘æ­£ç¡®
 colorbar;
 xlabel('Sample index');
 ylabel('Tooth profile error');
 title('Heat map of tooth profile error');
-% ÉèÖÃ°×É«µ½À¶É«½¥±äÑÕÉ«Ó³Éä
-n = 256; % ÑÕÉ«Ó³ÉäµÄ·Ö±æÂÊ
-white_to_blue_map = [linspace(1, 0, n)', linspace(1, 0, n)', ones(n, 1)]; % ´Ó°×É«µ½À¶É«µÄ½¥±ä
+% è®¾ç½®ç™½è‰²åˆ°è“è‰²æ¸å˜é¢œè‰²æ˜ å°„
+n = 256; % é¢œè‰²æ˜ å°„çš„åˆ†è¾¨ç‡
+white_to_blue_map = [linspace(1, 0, n)', linspace(1, 0, n)', ones(n, 1)]; % ä»ç™½è‰²åˆ°è“è‰²çš„æ¸å˜
 colormap(white_to_blue_map);
 
 
 %%
-%y1y2ÈÈÍ¼
+%y1y2çƒ­å›¾
 
-% ¼ÆËã¶şÎ¬Ö±·½Í¼
-numBins = 100; % ÉèÖÃÖ±·½Í¼µÄ±ßÊı
+% è®¡ç®—äºŒç»´ç›´æ–¹å›¾
+numBins = 100; % è®¾ç½®ç›´æ–¹å›¾çš„è¾¹æ•°
 [counts, edges] = hist3([Y1_values_filtered, Y2_values_filtered], 'Nbins', [numBins numBins]);
-% Æ½»¬´¦Àí
-counts = imgaussfilt(counts, 1); % Ê¹ÓÃ¸ßË¹ÂË²¨Æ÷½øĞĞÆ½»¬´¦Àí
-% ´´½¨Í¼ĞÎ´°¿Ú²¢ÉèÖÃ±³¾°ÑÕÉ«Îª°×É«
+% å¹³æ»‘å¤„ç†
+counts = imgaussfilt(counts, 1); % ä½¿ç”¨é«˜æ–¯æ»¤æ³¢å™¨è¿›è¡Œå¹³æ»‘å¤„ç†
+% åˆ›å»ºå›¾å½¢çª—å£å¹¶è®¾ç½®èƒŒæ™¯é¢œè‰²ä¸ºç™½è‰²
 figure('Color', 'w');
-% »æÖÆÈÈ¶ÈÍ¼
+% ç»˜åˆ¶çƒ­åº¦å›¾
 imagesc(edges{1}, edges{2}, counts');
-set(gca, 'YDir', 'normal'); % µ÷ÕûYÖá·½Ïò£¬Ê¹Ô­µãÔÚ×óÏÂ½Ç
-% ×Ô¶¨ÒåÑÕÉ«Ó³Éä£º´Ó°×É«µ½ºìÉ«
+set(gca, 'YDir', 'normal'); % è°ƒæ•´Yè½´æ–¹å‘ï¼Œä½¿åŸç‚¹åœ¨å·¦ä¸‹è§’
+% è‡ªå®šä¹‰é¢œè‰²æ˜ å°„ï¼šä»ç™½è‰²åˆ°çº¢è‰²
 customColormap = [linspace(1, 1, 256)', linspace(1, 0, 256)', linspace(1, 0, 256)'];
 colormap(customColormap);
-% Ìí¼ÓÑÕÉ«Ìõ
+% æ·»åŠ é¢œè‰²æ¡
 colorbar;
-% ÉèÖÃÍ¼ĞÎ±³¾°ÑÕÉ«Îª°×É«
+% è®¾ç½®å›¾å½¢èƒŒæ™¯é¢œè‰²ä¸ºç™½è‰²
 set(gca, 'Color', 'w');
-% Ìí¼Ó±êÌâºÍÖá±êÇ©
+% æ·»åŠ æ ‡é¢˜å’Œè½´æ ‡ç­¾
 title('Tooth profile error - Quality loss curve', 'FontSize', 14);
 xlabel('Tooth profile error', 'FontSize', 12);
 ylabel('Quality loss', 'FontSize', 12);
-% ÉèÖÃÍ¼ĞÎÊôĞÔ
-set(gca, 'FontSize', 12, 'Box', 'on'); % ÉèÖÃ×ÖÌå´óĞ¡ºÍ±ß¿ò
-axis square; % Ê¹×ø±êÖáÎª·½ĞÎ
-% µ÷ÕûÑÕÉ«Ìõ
+% è®¾ç½®å›¾å½¢å±æ€§
+set(gca, 'FontSize', 12, 'Box', 'on'); % è®¾ç½®å­—ä½“å¤§å°å’Œè¾¹æ¡†
+axis square; % ä½¿åæ ‡è½´ä¸ºæ–¹å½¢
+% è°ƒæ•´é¢œè‰²æ¡
 c = colorbar;
 c.Label.String = 'Density';
 c.Label.FontSize = 12;
-% È·±£ÈÈ¶ÈÍ¼±³¾°Îª°×É«
+% ç¡®ä¿çƒ­åº¦å›¾èƒŒæ™¯ä¸ºç™½è‰²
 set(gcf, 'InvertHardcopy', 'off');
  %%
-% %»æÖÆÖ±·½Í¼
-% % »æÖÆy1µÄÖ±·½Í¼
-% figure('Color', 'w'); % ´´½¨Ò»¸öĞÂÍ¼ĞÎ´°¿Ú
-% histogram(Y1_values_filtered, 50); % Ê¹ÓÃ50¸öÖù×ÓÀ´»æÖÆÖ±·½Í¼
-% title('ºóÑé');
+% %ç»˜åˆ¶ç›´æ–¹å›¾
+% % ç»˜åˆ¶y1çš„ç›´æ–¹å›¾
+% figure('Color', 'w'); % åˆ›å»ºä¸€ä¸ªæ–°å›¾å½¢çª—å£
+% histogram(Y1_values_filtered, 50); % ä½¿ç”¨50ä¸ªæŸ±å­æ¥ç»˜åˆ¶ç›´æ–¹å›¾
+% title('åéªŒ');
 % xlabel('Y1 values');
 % ylabel('Frequency');
-% box off; % ¹Ø±ÕÍ¼ĞÎµÄ±ß¿òÏß
+% box off; % å…³é—­å›¾å½¢çš„è¾¹æ¡†çº¿
 % 
-% % »æÖÆy1µÄÖ±·½Í¼
-% figure('Color', 'w'); % ´´½¨Ò»¸öĞÂÍ¼ĞÎ´°¿Ú
-% histogram(Y1_prior_values, 50); % Ê¹ÓÃ50¸öÖù×ÓÀ´»æÖÆÖ±·½Í¼
-% title('ÏÈÑé');
+% % ç»˜åˆ¶y1çš„ç›´æ–¹å›¾
+% figure('Color', 'w'); % åˆ›å»ºä¸€ä¸ªæ–°å›¾å½¢çª—å£
+% histogram(Y1_prior_values, 50); % ä½¿ç”¨50ä¸ªæŸ±å­æ¥ç»˜åˆ¶ç›´æ–¹å›¾
+% title('å…ˆéªŒ');
 % xlabel('Y1 values');
 % ylabel('Frequency');
-% box off; % ¹Ø±ÕÍ¼ĞÎµÄ±ß¿òÏß
+% box off; % å…³é—­å›¾å½¢çš„è¾¹æ¡†çº¿
 % 
-% % »æÖÆy1µÄÖ±·½Í¼
-% figure('Color', 'w'); % ´´½¨Ò»¸öĞÂÍ¼ĞÎ´°¿Ú
-% histogram(actual_Y1, 50); % Ê¹ÓÃ50¸öÖù×ÓÀ´»æÖÆÖ±·½Í¼
-% title('Êµ¼Ê');
+% % ç»˜åˆ¶y1çš„ç›´æ–¹å›¾
+% figure('Color', 'w'); % åˆ›å»ºä¸€ä¸ªæ–°å›¾å½¢çª—å£
+% histogram(actual_Y1, 50); % ä½¿ç”¨50ä¸ªæŸ±å­æ¥ç»˜åˆ¶ç›´æ–¹å›¾
+% title('å®é™…');
 % xlabel('Y1 values');
 % ylabel('Frequency');
-% box off; % ¹Ø±ÕÍ¼ĞÎµÄ±ß¿òÏß
+% box off; % å…³é—­å›¾å½¢çš„è¾¹æ¡†çº¿
 %%
-%»æÖÆy1ºóÑéÑù±¾ºÍÊµ¼ÊÑù±¾±È½Ï
-% È·±£ Y1_values_filtered ºÍ actual_Y1 µÄ³¤¶ÈÒ»ÖÂ£¬²åÖµ actual_Y1
+%ç»˜åˆ¶y1åéªŒæ ·æœ¬å’Œå®é™…æ ·æœ¬æ¯”è¾ƒ
+% ç¡®ä¿ Y1_values_filtered å’Œ actual_Y1 çš„é•¿åº¦ä¸€è‡´ï¼Œæ’å€¼ actual_Y1
 xi = linspace(1, length(actual_Y1), length(Y1_values_filtered));
 actual_Y1_interpolated = interp1(1:length(actual_Y1), actual_Y1, xi);
-% »æÖÆºóÑéµÄÖ±·½Í¼ºÍºËÃÜ¶ÈÍ¼
-figure('Color', 'w'); % ´´½¨Ò»¸öĞÂÍ¼ĞÎ´°¿Ú
-hold on; % ±£³Öµ±Ç°Í¼ĞÎ
-% »æÖÆºóÑéÖ±·½Í¼
+% ç»˜åˆ¶åéªŒçš„ç›´æ–¹å›¾å’Œæ ¸å¯†åº¦å›¾
+figure('Color', 'w'); % åˆ›å»ºä¸€ä¸ªæ–°å›¾å½¢çª—å£
+hold on; % ä¿æŒå½“å‰å›¾å½¢
+% ç»˜åˆ¶åéªŒç›´æ–¹å›¾
 h1 = histogram(Y1_values_filtered, 20, 'Normalization', 'pdf');
-h1.FaceColor = [0 0.4470 0.7410]; % À¶É«
-h1.EdgeColor = 'none'; % ÎŞÍâ¿òÏß
-h1.FaceAlpha = 0.5; % ÉèÖÃÍ¸Ã÷¶È
-% »æÖÆÊµ¼ÊÖ±·½Í¼
+h1.FaceColor = [0 0.4470 0.7410]; % è“è‰²
+h1.EdgeColor = 'none'; % æ— å¤–æ¡†çº¿
+h1.FaceAlpha = 0.5; % è®¾ç½®é€æ˜åº¦
+% ç»˜åˆ¶å®é™…ç›´æ–¹å›¾
 h2 = histogram(actual_Y1_interpolated, 20, 'Normalization', 'pdf');
-h2.FaceColor = [0.8500 0.3250 0.0980]; % ³ÈÉ«
-h2.EdgeColor = 'none'; % ÎŞÍâ¿òÏß
-h2.FaceAlpha = 0.5; % ÉèÖÃÍ¸Ã÷¶È
-% ¼ÆËã²¢»æÖÆºóÑéµÄºËÃÜ¶ÈÍ¼
+h2.FaceColor = [0.8500 0.3250 0.0980]; % æ©™è‰²
+h2.EdgeColor = 'none'; % æ— å¤–æ¡†çº¿
+h2.FaceAlpha = 0.5; % è®¾ç½®é€æ˜åº¦
+% è®¡ç®—å¹¶ç»˜åˆ¶åéªŒçš„æ ¸å¯†åº¦å›¾
 [f1, xi1] = ksdensity(Y1_values_filtered); 
-plot(xi1, f1, 'Color', [0 0.4470 0.7410], 'LineWidth', 2); % ºËÃÜ¶ÈÍ¼ÓÃÀ¶É«
-% ¼ÆËã²¢»æÖÆÊµ¼ÊµÄºËÃÜ¶ÈÍ¼
+plot(xi1, f1, 'Color', [0 0.4470 0.7410], 'LineWidth', 2); % æ ¸å¯†åº¦å›¾ç”¨è“è‰²
+% è®¡ç®—å¹¶ç»˜åˆ¶å®é™…çš„æ ¸å¯†åº¦å›¾
 [f2, xi2] = ksdensity(actual_Y1_interpolated); 
-plot(xi2, f2, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 2); % ºËÃÜ¶ÈÍ¼ÓÃ³ÈÉ«
+plot(xi2, f2, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 2); % æ ¸å¯†åº¦å›¾ç”¨æ©™è‰²
 title('Comparison between the predicted and experimental values of the probability density function and kernel density estimation of tooth profile errors');
 xlabel('Tooth profile error');
 ylabel('Density');
-legend('ºóÑéÖ±·½Í¼', 'Êµ¼ÊÖ±·½Í¼', 'ºóÑéºËÃÜ¶ÈÍ¼', 'Êµ¼ÊºËÃÜ¶ÈÍ¼');
-% ÉèÖÃÍ¼ÀıºÍÖáµÄ×ÖÌå´óĞ¡
+legend('åéªŒç›´æ–¹å›¾', 'å®é™…ç›´æ–¹å›¾', 'åéªŒæ ¸å¯†åº¦å›¾', 'å®é™…æ ¸å¯†åº¦å›¾');
+% è®¾ç½®å›¾ä¾‹å’Œè½´çš„å­—ä½“å¤§å°
 set(gca, 'FontSize', 12);
 legend('show', 'Location', 'best');
-hold off; % ÊÍ·Åµ±Ç°Í¼ĞÎ
+hold off; % é‡Šæ”¾å½“å‰å›¾å½¢
 %%
-%¼ÆËã¸ÅÂÊÃÜ¶È±È½ÏÖµ
-% ¼ÆËã¶ÔÊıËÆÈ»±È
+%è®¡ç®—æ¦‚ç‡å¯†åº¦æ¯”è¾ƒå€¼
+% è®¡ç®—å¯¹æ•°ä¼¼ç„¶æ¯”
 mu_pred = mean(Y1_values_filtered);
 sigma_pred = std(Y1_values_filtered);
 log_likelihood_pred = -0.5 * sum((actual_Y1_interpolated - mu_pred).^2 / sigma_pred^2 + log(2 * pi * sigma_pred^2));
-disp(['¶ÔÊıËÆÈ»±È: ', num2str(log_likelihood_pred)]);
+disp(['å¯¹æ•°ä¼¼ç„¶æ¯”: ', num2str(log_likelihood_pred)]);
 
-% ¼ÆËã KL É¢¶È
+% è®¡ç®— KL æ•£åº¦
 mu_actual = mean(actual_Y1_interpolated);
 sigma_actual = std(actual_Y1_interpolated);
 
 KL_divergence = log(sigma_actual/sigma_pred) + (sigma_pred^2 + (mu_pred - mu_actual)^2) / (2 * sigma_actual^2) - 0.5;
-disp(['KL É¢¶È: ', num2str(KL_divergence)]);
+disp(['KL æ•£åº¦: ', num2str(KL_divergence)]);
 
-% ¼ÆËã CRPS
-% ´´½¨Ò»¸öÆÀ¹Àµã·¶Î§
+% è®¡ç®— CRPS
+% åˆ›å»ºä¸€ä¸ªè¯„ä¼°ç‚¹èŒƒå›´
 y_range = linspace(min(actual_Y1_interpolated)-5, max(actual_Y1_interpolated)+5, 1000);
-F_pred = normcdf(y_range, mu_pred, sigma_pred);  % Ô¤²â·Ö²¼µÄCDF
-F_obs = normcdf(y_range, mean(actual_Y1_interpolated), std(actual_Y1_interpolated)); % ÕæÊµ¹Û²âÖµµÄCDF
+F_pred = normcdf(y_range, mu_pred, sigma_pred);  % é¢„æµ‹åˆ†å¸ƒçš„CDF
+F_obs = normcdf(y_range, mean(actual_Y1_interpolated), std(actual_Y1_interpolated)); % çœŸå®è§‚æµ‹å€¼çš„CDF
 
-% ¼ÆËã CRPS
-crps_value = trapz(y_range, (F_pred - F_obs).^2); % Ê¹ÓÃÊıÖµ»ı·Ö¼ÆËã CRPS
+% è®¡ç®— CRPS
+crps_value = trapz(y_range, (F_pred - F_obs).^2); % ä½¿ç”¨æ•°å€¼ç§¯åˆ†è®¡ç®— CRPS
 disp(['CRPS: ', num2str(crps_value)]);
 %%
-%³İÀªÏßÔ¤²â
-% ÉèÖÃ³éÈ¡µÄµãÊıºÍÊı¾İ¼¯Êı
+%é½¿å»“çº¿é¢„æµ‹
+% è®¾ç½®æŠ½å–çš„ç‚¹æ•°å’Œæ•°æ®é›†æ•°
 num_points = 37;
 num_datasets = 4;
 
-% ³õÊ¼»¯´æ´¢³éÈ¡µÄµãµÄÊı×é
+% åˆå§‹åŒ–å­˜å‚¨æŠ½å–çš„ç‚¹çš„æ•°ç»„
 all_y1_values = zeros(num_points, num_datasets);
 
-% »ñÈ¡ºóÑéÑù±¾µÄ×î´óÖµºÍ×îĞ¡Öµ
+% è·å–åéªŒæ ·æœ¬çš„æœ€å¤§å€¼å’Œæœ€å°å€¼
 posterior_samples = squeeze(Y1_values_filtered(:, :, end));
 y1_max = max(Y1_values_filtered(:, 1));
-% ÖØ¸´³éÈ¡¶à×éÊı¾İ¼¯²¢»æÖÆÉ¢µãÍ¼
+% é‡å¤æŠ½å–å¤šç»„æ•°æ®é›†å¹¶ç»˜åˆ¶æ•£ç‚¹å›¾
 for dataset = 1:num_datasets
-    % °´ÕÕºóÑéÑù±¾Êä³öÖµ y1 µÄ¸ÅÂÊÃÜ¶È·Ö²¼³éÈ¡ 37 ¸öµã
+    % æŒ‰ç…§åéªŒæ ·æœ¬è¾“å‡ºå€¼ y1 çš„æ¦‚ç‡å¯†åº¦åˆ†å¸ƒæŠ½å– 37 ä¸ªç‚¹
     y1_values_sampled = zeros(num_points, 1);
     for i = 1:num_points
-        % Ê¹ÓÃÃÉÌØ¿¨Âå·½·¨´ÓºóÑéÑù±¾Êä³öÖµ y1 µÄ¸ÅÂÊÃÜ¶È·Ö²¼ÖĞ³éÈ¡Ò»¸öµã
+        % ä½¿ç”¨è’™ç‰¹å¡æ´›æ–¹æ³•ä»åéªŒæ ·æœ¬è¾“å‡ºå€¼ y1 çš„æ¦‚ç‡å¯†åº¦åˆ†å¸ƒä¸­æŠ½å–ä¸€ä¸ªç‚¹
         y1_values_sampled(i) = randsample(posterior_samples(:, 1), 1);
     end
      
-%         % È·±£³éÈ¡µÄµã°üº¬ y1 µÄ×î´óÖµºÍ×îĞ¡Öµ
+%         % ç¡®ä¿æŠ½å–çš„ç‚¹åŒ…å« y1 çš„æœ€å¤§å€¼å’Œæœ€å°å€¼
 %     y1_values_sampled(end) = y1_max;
 %     
 %     all_y1_values(:, dataset) = y1_values_sampled;
 %     
-    % ¼ÇÂ¼É¢µã×ø±ê
+    % è®°å½•æ•£ç‚¹åæ ‡
     scatter_coordinates = [1:num_points; y1_values_sampled']';
     all_scatter_coordinates{dataset} = scatter_coordinates;
     
-    % »æÖÆÉ¢µãÍ¼
+    % ç»˜åˆ¶æ•£ç‚¹å›¾
     figure('Color', 'w');
     scatter(1:num_points, y1_values_sampled, 'filled');
     xlabel('Data Point Index');
     ylabel('y1');
     title(['Scatter Plot of y1 for Dataset ', num2str(dataset)]);
     
-    % Êä³öÉ¢µã¾ßÌåÊı¾İ
+    % è¾“å‡ºæ•£ç‚¹å…·ä½“æ•°æ®
     disp(['Scatter Coordinates for Dataset ', num2str(dataset), ':']);
     disp(scatter_coordinates);
     
 end
 
 %%
-%ÄâºÏÎó²î-ÖÊÁ¿ËğÊ§º¯ÊıÇúÏß
-% ¶ÔÊµ¼ÊÊı¾İ½øĞĞ¶ş´Î¶àÏîÊ½ÄâºÏ
+%æ‹Ÿåˆè¯¯å·®-è´¨é‡æŸå¤±å‡½æ•°æ›²çº¿
+% å¯¹å®é™…æ•°æ®è¿›è¡ŒäºŒæ¬¡å¤šé¡¹å¼æ‹Ÿåˆ
 p_actual_y1 = polyfit(actual_Y1, actual_Y2, 2);
 
-% Éú³ÉÓÃÓÚ»æÍ¼µÄÊµ¼ÊÊı¾İÄâºÏÇúÏß
+% ç”Ÿæˆç”¨äºç»˜å›¾çš„å®é™…æ•°æ®æ‹Ÿåˆæ›²çº¿
 x_fit_actual_y1 = linspace(min(actual_Y1), max(actual_Y1), 100);
 y_fit_actual_y1 = polyval(p_actual_y1, x_fit_actual_y1);
 
-% ×îĞ¡»¯Ä¿±êº¯Êı£ºÕÒµ½×î¼ÑµÄ a Ê¹µÃ×ÜÆ½·½Îó²î×îĞ¡
+% æœ€å°åŒ–ç›®æ ‡å‡½æ•°ï¼šæ‰¾åˆ°æœ€ä½³çš„ a ä½¿å¾—æ€»å¹³æ–¹è¯¯å·®æœ€å°
 objFun = @(a) sum((a * Y1_values_filtered.^2 - Y2_values_filtered).^2);
 
-% Ê¹ÓÃ fminsearch ÕÒµ½×î¼ÑµÄ a
-%   a_opt = fminsearch(objFun, 1);  % ³õÊ¼²Â²âÎª 1
+% ä½¿ç”¨ fminsearch æ‰¾åˆ°æœ€ä½³çš„ a
+%   a_opt = fminsearch(objFun, 1);  % åˆå§‹çŒœæµ‹ä¸º 1
   a_opt = 6.907735433500013e+08;
-% Ê¹ÓÃµÃµ½µÄÏµÊı a_opt Éú³ÉÄâºÏÇúÏß
+% ä½¿ç”¨å¾—åˆ°çš„ç³»æ•° a_opt ç”Ÿæˆæ‹Ÿåˆæ›²çº¿
 x_fit = linspace(min(Y1_values_filtered), max(Y1_values_filtered), 100);
 y_fit = a_opt * x_fit.^2;
 
-% »æÖÆÊµ¼ÊÊı¾İÉ¢µã¼°ÄâºÏÇúÏß
+% ç»˜åˆ¶å®é™…æ•°æ®æ•£ç‚¹åŠæ‹Ÿåˆæ›²çº¿
 figure('Color', 'w');
-% plot(actual_Y1_filtered, actual_Y2_filtered, 'ro');  % Êµ¼ÊÊı¾İµÄÉ¢µãÍ¼
+% plot(actual_Y1_filtered, actual_Y2_filtered, 'ro');  % å®é™…æ•°æ®çš„æ•£ç‚¹å›¾
 hold on;
-plot(x_fit_actual_y1, y_fit_actual_y1, 'r-');  % Êµ¼ÊÊı¾İµÄÄâºÏÇúÏß
+plot(x_fit_actual_y1, y_fit_actual_y1, 'r-');  % å®é™…æ•°æ®çš„æ‹Ÿåˆæ›²çº¿
 
-% »æÖÆºóÑéÑù±¾Êı¾İÉ¢µã¼°ÄâºÏÇúÏß
-% plot(Y1_values_filtered, Y2_values_filtered, 'bo');  % ºóÑéÑù±¾µÄÉ¢µãÍ¼
-plot(x_fit, y_fit, 'b-');  % ºóÑéÑù±¾µÄÄâºÏÇúÏß
+% ç»˜åˆ¶åéªŒæ ·æœ¬æ•°æ®æ•£ç‚¹åŠæ‹Ÿåˆæ›²çº¿
+% plot(Y1_values_filtered, Y2_values_filtered, 'bo');  % åéªŒæ ·æœ¬çš„æ•£ç‚¹å›¾
+plot(x_fit, y_fit, 'b-');  % åéªŒæ ·æœ¬çš„æ‹Ÿåˆæ›²çº¿
 
-% ÉèÖÃÍ¼ÀıºÍ±êÌâ
+% è®¾ç½®å›¾ä¾‹å’Œæ ‡é¢˜
 legend('Actual Data', 'Actual Quadratic Fit');
 title('Tooth profile error - Quality loss curve');
 xlabel('Tooth profile error');
 ylabel('Quality loss');
-box off; % ¹Ø±ÕÍ¼ĞÎµÄ±ß¿òÏß
+box off; % å…³é—­å›¾å½¢çš„è¾¹æ¡†çº¿
 hold off;
 %%
-% %ÄâºÏÎó²î-ÖÊÁ¿ËğÊ§º¯ÊıÇúÏß£¨²¿·Ö£©
-% % ¶ÔÊµ¼ÊÊı¾İ½øĞĞ¶ş´Î¶àÏîÊ½ÄâºÏ
+% %æ‹Ÿåˆè¯¯å·®-è´¨é‡æŸå¤±å‡½æ•°æ›²çº¿ï¼ˆéƒ¨åˆ†ï¼‰
+% % å¯¹å®é™…æ•°æ®è¿›è¡ŒäºŒæ¬¡å¤šé¡¹å¼æ‹Ÿåˆ
 % p_actual_y1 = polyfit(actual_Y1, actual_Y2, 2);
 % 
-% % Éú³ÉÓÃÓÚ»æÍ¼µÄÊµ¼ÊÊı¾İÄâºÏÇúÏß
+% % ç”Ÿæˆç”¨äºç»˜å›¾çš„å®é™…æ•°æ®æ‹Ÿåˆæ›²çº¿
 % x_fit_actual_y1 = linspace(min(actual_Y1), max(actual_Y1), 100);
 % y_fit_actual_y1 = polyval(p_actual_y1, x_fit_actual_y1);
 % 
-% % ×îĞ¡»¯Ä¿±êº¯Êı£ºÕÒµ½×î¼ÑµÄ a Ê¹µÃ×ÜÆ½·½Îó²î×îĞ¡
+% % æœ€å°åŒ–ç›®æ ‡å‡½æ•°ï¼šæ‰¾åˆ°æœ€ä½³çš„ a ä½¿å¾—æ€»å¹³æ–¹è¯¯å·®æœ€å°
 % objFun = @(a) sum((a * Y1_values_filtered.^2 - Y2_values_filtered).^2);
 % 
-% % Ê¹ÓÃ fminsearch ÕÒµ½×î¼ÑµÄ a
-% % a_opt = fminsearch(objFun, 1);  % ³õÊ¼²Â²âÎª 1
+% % ä½¿ç”¨ fminsearch æ‰¾åˆ°æœ€ä½³çš„ a
+% % a_opt = fminsearch(objFun, 1);  % åˆå§‹çŒœæµ‹ä¸º 1
 % a_opt = 6.907735433500013e+08;
 % 
-% % »ñÈ¡actual_Y1µÄ×î´óÖµºÍ×îĞ¡Öµ
+% % è·å–actual_Y1çš„æœ€å¤§å€¼å’Œæœ€å°å€¼
 % min_actual_Y1 = min(actual_Y1);
 % max_actual_Y1 = max(actual_Y1);
 % 
-% % Ö»ÔÚ actual_Y1 µÄ×î´óÖµºÍ×îĞ¡ÖµÖ®¼äÉú³ÉÄâºÏÇúÏß
+% % åªåœ¨ actual_Y1 çš„æœ€å¤§å€¼å’Œæœ€å°å€¼ä¹‹é—´ç”Ÿæˆæ‹Ÿåˆæ›²çº¿
 % x_fit = linspace(min_actual_Y1, max_actual_Y1, 100);
 % y_fit = a_opt * x_fit.^2;
 % 
-% % »æÖÆÊµ¼ÊÊı¾İÉ¢µã¼°ÄâºÏÇúÏß
+% % ç»˜åˆ¶å®é™…æ•°æ®æ•£ç‚¹åŠæ‹Ÿåˆæ›²çº¿
 % figure('Color', 'w');
-% % plot(actual_Y1_filtered, actual_Y2_filtered, 'ro');  % Êµ¼ÊÊı¾İµÄÉ¢µãÍ¼
+% % plot(actual_Y1_filtered, actual_Y2_filtered, 'ro');  % å®é™…æ•°æ®çš„æ•£ç‚¹å›¾
 % hold on;
-% plot(x_fit_actual_y1, y_fit_actual_y1, 'r-');  % Êµ¼ÊÊı¾İµÄÄâºÏÇúÏß
+% plot(x_fit_actual_y1, y_fit_actual_y1, 'r-');  % å®é™…æ•°æ®çš„æ‹Ÿåˆæ›²çº¿
 % 
-% % »æÖÆºóÑéÑù±¾Êı¾İÉ¢µã¼°ÄâºÏÇúÏß
-% % plot(Y1_values_filtered, Y2_values_filtered, 'bo');  % ºóÑéÑù±¾µÄÉ¢µãÍ¼
-% plot(x_fit, y_fit, 'b-');  % ºóÑéÑù±¾µÄÄâºÏÇúÏß
+% % ç»˜åˆ¶åéªŒæ ·æœ¬æ•°æ®æ•£ç‚¹åŠæ‹Ÿåˆæ›²çº¿
+% % plot(Y1_values_filtered, Y2_values_filtered, 'bo');  % åéªŒæ ·æœ¬çš„æ•£ç‚¹å›¾
+% plot(x_fit, y_fit, 'b-');  % åéªŒæ ·æœ¬çš„æ‹Ÿåˆæ›²çº¿
 % 
-% % ÉèÖÃÍ¼ÀıºÍ±êÌâ
+% % è®¾ç½®å›¾ä¾‹å’Œæ ‡é¢˜
 % legend('Actual Data', 'Actual Quadratic Fit');
 % title('Tooth profile error - Quality loss curve');
 % xlabel('Tooth profile error');
 % ylabel('Quality loss');
-% box off; % ¹Ø±ÕÍ¼ĞÎµÄ±ß¿òÏß
+% box off; % å…³é—­å›¾å½¢çš„è¾¹æ¡†çº¿
 % hold off;
 
-% ½áÊø¼ÆÊ±²¢Êä³ö¾­¹ıµÄÊ±¼ä
+% ç»“æŸè®¡æ—¶å¹¶è¾“å‡ºç»è¿‡çš„æ—¶é—´
 elapsed_time = toc;
-disp(['´úÂëÖ´ĞĞÊ±¼ä: ', num2str(elapsed_time), ' Ãë']);
+disp(['ä»£ç æ‰§è¡Œæ—¶é—´: ', num2str(elapsed_time), ' ç§’']);
