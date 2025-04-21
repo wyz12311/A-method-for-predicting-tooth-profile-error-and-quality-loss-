@@ -1,1 +1,1 @@
-This code is only used a method for predicting tooth profile error and quality loss considering the coupled effects of static and dynamic errors 
+This code is only used for the research of tooth profile error and quality loss prediction methods considering the coupled influence of static error and dynamic error
